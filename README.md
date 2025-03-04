@@ -8,7 +8,7 @@ This project is a web-based compiler that allows users to write, execute, and do
 # Features
 
 Monaco Editor Integration: A powerful code editor with syntax highlighting and customizable font size.
-JavaScript Execution: Runs JavaScript code directly in the browser.
+JavaScript Execution: Runs JavaScript code directly in the browser and you can access alert prompt browser features
 Python Execution: Uses an external API (Piston) to execute Python code.
 Download Feature: Allows users to save their code as .js or .py files.
 Theme & Layout: Dark-themed UI with a responsive design.
