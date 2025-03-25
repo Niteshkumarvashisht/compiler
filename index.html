@@ -17,7 +17,6 @@
       margin: 0;
       padding: 0;
     }
-
     body {
       font-family: 'Arial', sans-serif;
       background-color: #1e1e1e;
@@ -25,12 +24,10 @@
       padding: 10px;
       user-select: none; /* Prevents text selection during drag */
     }
-
     h2 {
       text-align: center;
       margin-bottom: 10px;
     }
-
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -38,7 +35,6 @@
       gap: 10px;
       margin-bottom: 10px;
     }
-
     select, input, button {
       padding: 8px;
       font-size: 14px;
@@ -46,17 +42,14 @@
       border: none;
       cursor: pointer;
     }
-
     button {
       background: #007acc;
       color: #fff;
       transition: 0.3s;
     }
-
     button:hover {
       background: #005f99;
     }
-
     .container {
       display: flex;
       gap: 0; /* Remove gap so divider touches panels */
@@ -65,19 +58,16 @@
       border-radius: 5px;
       overflow: hidden;
     }
-
     #editor {
       flex: 2;
       border-right: 1px solid #555;
     }
-
     /* Divider Style */
     #divider {
       width: 5px;
       background: #444;
       cursor: col-resize;
     }
-
     #output {
       flex: 1;
       background: #252526;
@@ -89,7 +79,6 @@
       overflow: auto;
       text-align: left;
     }
-
     /* Responsive Design */
     @media (max-width: 900px) {
       .container {
@@ -151,7 +140,6 @@
       let defaultCode = currentLanguage === "javascript" 
         ? "// JavaScript Code\nconsole.log('Hello, World!');" 
         : "# Python Code\nprint('Hello, World!')";
-
       editor.setValue(defaultCode);
       monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
     }
@@ -160,7 +148,6 @@
       let code = editor.getValue();
       let outputDiv = document.getElementById("output");
       outputDiv.innerHTML = ""; 
-
       if (currentLanguage === "javascript") {
         runJavaScript(code);
       } else {
@@ -186,7 +173,6 @@
     async function runPython(code) {
       let outputDiv = document.getElementById("output");
       outputDiv.innerHTML = "Running Python Code...";
-
       try {
         let response = await fetch("https://emkc.org/api/v2/piston/execute", {
           method: "POST",
@@ -214,11 +200,9 @@
     function downloadCode() {
       let code = editor.getValue();
       let extension = { javascript: "js", python: "py" }[currentLanguage];
-
       let filename = prompt("Enter the filename (without extension):", "code");
       if (!filename) return;
       filename = filename.replace(/\.[^/.]+$/, "") + `.${extension}`;
-
       let blob = new Blob([code], { type: "text/plain" });
       let link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -226,34 +210,44 @@
       link.click();
     }
 
-    // Divider functionality for horizontal resizing
+    // Divider functionality for responsive horizontal/vertical resizing
     const divider = document.getElementById("divider");
     const container = document.querySelector(".container");
+    const editorDiv = document.getElementById("editor");
+    const outputDiv = document.getElementById("output");
     let isDragging = false;
 
     divider.addEventListener("mousedown", (e) => {
       isDragging = true;
-      document.body.style.cursor = "col-resize";
+      // Change cursor based on layout
+      if (window.innerWidth < 900) {
+        document.body.style.cursor = "row-resize";
+      } else {
+        document.body.style.cursor = "col-resize";
+      }
     });
 
     document.addEventListener("mousemove", (e) => {
       if (!isDragging) return;
-      // Get container's bounding rectangle
       let containerRect = container.getBoundingClientRect();
-      // Calculate new width for editor based on mouse position
-      let newEditorWidth = e.clientX - containerRect.left;
-      // Set minimum width to avoid collapse
-      if(newEditorWidth < 100) newEditorWidth = 100;
-      if(newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
-      
-      // Adjust flex basis of editor and output
-      document.getElementById("editor").style.flex = "none";
-      document.getElementById("editor").style.width = newEditorWidth + "px";
-      
-      // Remaining width for output
-      let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
-      document.getElementById("output").style.flex = "none";
-      document.getElementById("output").style.width = newOutputWidth + "px";
+
+      if (window.innerWidth < 900) {
+        // Vertical resizing for column layout
+        let newEditorHeight = e.clientY - containerRect.top;
+        if(newEditorHeight < 50) newEditorHeight = 50;
+        if(newEditorHeight > containerRect.height - 50) newEditorHeight = containerRect.height - 50;
+        editorDiv.style.height = newEditorHeight + "px";
+        let newOutputHeight = containerRect.height - newEditorHeight - divider.offsetHeight;
+        outputDiv.style.height = newOutputHeight + "px";
+      } else {
+        // Horizontal resizing for row layout
+        let newEditorWidth = e.clientX - containerRect.left;
+        if(newEditorWidth < 100) newEditorWidth = 100;
+        if(newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
+        editorDiv.style.width = newEditorWidth + "px";
+        let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
+        outputDiv.style.width = newOutputWidth + "px";
+      }
     });
 
     document.addEventListener("mouseup", () => {
