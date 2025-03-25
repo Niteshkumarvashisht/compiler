@@ -7,7 +7,7 @@
   <!-- Updated Title -->
   <title>Nitesh js & python compiler</title>
   
-  <!-- Favicon Link (Adjust 'favicon.png' if your file name/path is different) -->
+  <!-- Favicon Link (Adjust 'Screenshot 2025-03-26 050804.png' if your file name/path is different) -->
   <link rel="icon" type="image/png" href="Screenshot 2025-03-26 050804.png" />
   
   <link
@@ -56,9 +56,10 @@
     button:hover {
       background: #005f99;
     }
+    /* Container is always horizontal */
     .container {
       display: flex;
-      gap: 0; /* Remove gap so divider touches panels */
+      gap: 0;
       height: 75vh;
       border: 1px solid #555;
       border-radius: 5px;
@@ -72,7 +73,7 @@
     #divider {
       width: 5px;
       background: #444;
-      cursor: col-resize;
+      cursor: col-resize; /* Always col-resize */
     }
     #output {
       flex: 1;
@@ -85,22 +86,7 @@
       overflow: auto;
       text-align: left;
     }
-    /* Responsive Design */
-    @media (max-width: 900px) {
-      .container {
-        flex-direction: column;
-        height: auto;
-      }
-      #divider {
-        height: 5px;
-        width: 100%;
-        cursor: row-resize;
-      }
-      #editor, #output {
-        width: 100%;
-        height: 55vh;
-      }
-    }
+    /* No mobile media query - removed */
   </style>
 </head>
 <body>
@@ -216,44 +202,33 @@
       link.click();
     }
 
-    // Divider functionality for responsive horizontal/vertical resizing
+    // Divider functionality for horizontal resizing only
     const divider = document.getElementById("divider");
     const container = document.querySelector(".container");
     const editorDiv = document.getElementById("editor");
     const outputDiv = document.getElementById("output");
     let isDragging = false;
 
-    divider.addEventListener("mousedown", (e) => {
+    divider.addEventListener("mousedown", () => {
       isDragging = true;
-      // Change cursor based on layout
-      if (window.innerWidth < 900) {
-        document.body.style.cursor = "row-resize";
-      } else {
-        document.body.style.cursor = "col-resize";
-      }
+      document.body.style.cursor = "col-resize";
     });
 
     document.addEventListener("mousemove", (e) => {
       if (!isDragging) return;
       let containerRect = container.getBoundingClientRect();
 
-      if (window.innerWidth < 900) {
-        // Vertical resizing for column layout
-        let newEditorHeight = e.clientY - containerRect.top;
-        if(newEditorHeight < 50) newEditorHeight = 50;
-        if(newEditorHeight > containerRect.height - 50) newEditorHeight = containerRect.height - 50;
-        editorDiv.style.height = newEditorHeight + "px";
-        let newOutputHeight = containerRect.height - newEditorHeight - divider.offsetHeight;
-        outputDiv.style.height = newOutputHeight + "px";
-      } else {
-        // Horizontal resizing for row layout
-        let newEditorWidth = e.clientX - containerRect.left;
-        if(newEditorWidth < 100) newEditorWidth = 100;
-        if(newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
-        editorDiv.style.width = newEditorWidth + "px";
-        let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
-        outputDiv.style.width = newOutputWidth + "px";
+      // Horizontal resizing logic
+      let newEditorWidth = e.clientX - containerRect.left;
+      // Prevent the editor from becoming too narrow or too wide
+      if (newEditorWidth < 100) newEditorWidth = 100;
+      if (newEditorWidth > containerRect.width - 100) {
+        newEditorWidth = containerRect.width - 100;
       }
+      editorDiv.style.width = newEditorWidth + "px";
+
+      let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
+      outputDiv.style.width = newOutputWidth + "px";
     });
 
     document.addEventListener("mouseup", () => {
