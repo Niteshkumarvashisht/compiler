@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JavaScript & Python/Node.js Editor</title>
-    
+
     <link rel="icon" type="image/png" href="Screenshot 2025-03-26 050804.png" />
-    
+
     <link
         href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
         rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
-    
+
     <style>
         * {
             box-sizing: border-box;
@@ -153,22 +153,26 @@
 </head>
 <body>
     <h2>JavaScript & Python/Node.js Editor</h2>
-    
+
     <div class="controls">
         <select id="languageSelector" onchange="changeLanguage()">
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="nodejs">Node.js</option>
         </select>
-        
+
         <input type="number" id="fontSize" value="18" min="10" max="30" onchange="updateFontSize()">
-        
+
         <button onclick="runCode()">
             <i class="ri-play-fill"></i> Run
         </button>
-        
+
         <button onclick="downloadCode()">
             <i class="ri-file-download-fill"></i> Download
+        </button>
+
+        <button onclick="clearConsole()">
+            <i class="ri-delete-bin-fill"></i> Clear
         </button>
     </div>
 
@@ -260,6 +264,8 @@
 
         function runCode() {
             const code = editor.getValue();
+            const consoleDiv = document.getElementById("console");
+            consoleDiv.innerHTML = ""; // Clear previous output
             if (currentLanguage === "javascript") {
                 runJavaScript(code);
             } else if (currentLanguage === "python") {
@@ -354,6 +360,10 @@
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
+        }
+
+        function clearConsole() {
+            document.getElementById("console").innerHTML = "";
         }
 
         // Divider functionality for horizontal resizing
