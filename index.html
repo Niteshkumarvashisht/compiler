@@ -1,272 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Nitesh js & python compiler</title>
-  
-  <!-- Favicon Link (Adjust 'Screenshot 2025-03-26 050804.png' if your file name/path is different) -->
-  <link rel="icon" type="image/png" href="Screenshot 2025-03-26 050804.png" />
-  
-  <link
-  <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
-    rel="stylesheet"
-  />
-  <!-- Monaco Editor -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
-  
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript & Python/Node.js Editor</title>
+    
+    <link rel="icon" type="image/png" href="Screenshot 2025-03-26 050804.png" />
+    
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+        rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #1e1e1e;
-      color: #fff;
-      padding: 10px;
-      user-select: none; /* Prevents text selection during drag */
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 15px;
-    }
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
 
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
 
-    select, input, button {
-      padding: 8px;
-      font-size: 14px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-    }
+        select, input, button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    button {
-      background: #007acc;
-      color: #fff;
-      transition: 0.3s;
-    }
+        select {
+            background-color: #333;
+            color: #eee;
+        }
 
-    button:hover {
-      background: #005f99;
-    }
+        input {
+            background-color: #333;
+            color: #eee;
+            width: 80px;
+        }
 
-    .container {
-      display: flex;
-      gap: 0; /* Remove gap so divider touches panels */
-      height: 75vh;
-      border: 1px solid #555;
-      border-radius: 5px;
-      overflow: hidden;
-    }
+        button {
+            background-color: #007acc;
+            color: #fff;
+        }
 
-    #editor {
-      flex: 2;
-      border-right: 1px solid #555;
-    }
+        button:hover {
+            background-color: #005f99;
+        }
 
-    /* Divider Style */
-    #divider {
-      width: 5px;
-      background: #444;
-      cursor: col-resize;
-    }
+        .container {
+            display: flex;
+            gap: 0;
+            flex: 1;
+            border: 1px solid #555;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-    #output {
-      flex: 1;
-      background: #252526;
-      color: #dcdcdc;
-      padding: 10px;
-      font-size: 16px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      overflow: auto;
-      text-align: left;
-    }
+        #editor-container {
+            flex: 2;
+            border-right: 1px solid #555;
+            overflow: hidden;
+            position: relative;
+        }
 
-    /* Responsive Design */
-    @media (max-width: 900px) {
-      .container {
-        flex-direction: column;
-        height: auto;
-      }
-      #divider {
-        height: 5px;
-        width: 100%;
-        cursor: row-resize;
-      }
-      #editor, #output {
-        width: 100%;
-        height: 50vh;
-      }
-    }
-  </style>
+        #editor {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #divider {
+            width: 5px;
+            background: #444;
+            cursor: col-resize;
+        }
+
+        #console {
+            flex: 1;
+            background-color: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            font-size: 16px;
+            margin-top: 0;
+            overflow: auto;
+            max-height: 100%;
+            box-shadow: none;
+        }
+
+        #console::before {
+            content: "> ";
+        }
+
+        .error {
+            color: #f00;
+        }
+        .warning{
+            color: #FFA500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            #divider {
+                height: 5px;
+                width: 100%;
+                cursor: row-resize;
+            }
+
+            #editor-container, #console {
+                width: 100%;
+                height: 50vh;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>JavaScript & Python Compiler</h2>
-  
-  <div class="controls">
-    <select id="languageSelector" onchange="changeLanguage()">
-      <option value="javascript">JavaScript</option>
-      <option value="python">Python</option>
-    </select>
+    <h2>JavaScript & Python/Node.js Editor</h2>
     
-    <input type="number" id="fontSize" value="18" min="10" max="30" onchange="updateFontSize()">
-    
-    <button onclick="runCode()"><i class="ri-play-fill"></i> Run</button>
-    
-    <button onclick="downloadCode()"><i class="ri-file-download-fill"></i> Download</button>
-  </div>
+    <div class="controls">
+        <select id="languageSelector" onchange="changeLanguage()">
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="nodejs">Node.js</option>
+        </select>
+        
+        <input type="number" id="fontSize" value="18" min="10" max="30" onchange="updateFontSize()">
+        
+        <button onclick="runCode()">
+            <i class="ri-play-fill"></i> Run
+        </button>
+        
+        <button onclick="downloadCode()">
+            <i class="ri-file-download-fill"></i> Download
+        </button>
+    </div>
 
-  <div class="container">
-    <div id="editor"></div>
-    <div id="divider"></div>
-    <div id="output">Output will appear here...</div>
-  </div>
+    <div class="container">
+        <div id="editor-container">
+            <div id="editor"></div>
+        </div>
+        <div id="divider"></div>
+        <div id="console"></div>
+    </div>
 
-  <script>
-    let editor;
-    let fontSize = 18; 
-    let currentLanguage = "javascript"; 
+    <script>
+        let editor;
+        let fontSize = 18;
+        let currentLanguage = "javascript";
 
-    require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs" } });
-    require(["vs/editor/editor.main"], function () {
-      editor = monaco.editor.create(document.getElementById("editor"), {
-        value: "// JavaScript Code\nconsole.log('Hello, World!');",
-        language: currentLanguage,
-        theme: "vs-dark",
-        automaticLayout: true,
-        fontSize: fontSize
-      });
-    });
-
-    function changeLanguage() {
-      currentLanguage = document.getElementById("languageSelector").value;
-      let defaultCode = currentLanguage === "javascript" 
-        ? "// JavaScript Code\nconsole.log('Hello, World!');" 
-        : "# Python Code\nprint('Hello, World!')";
-
-      editor.setValue(defaultCode);
-      monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
-    }
-
-    function runCode() {
-      let code = editor.getValue();
-      let outputDiv = document.getElementById("output");
-      outputDiv.innerHTML = ""; 
-
-      if (currentLanguage === "javascript") {
-        runJavaScript(code);
-      } else {
-        runPython(code);
-      }
-    }
-
-    function runJavaScript(code) {
-      let outputDiv = document.getElementById("output");
-      window._originalConsoleLog = console.log;
-      console.log = function (...args) {
-        outputDiv.innerHTML += args.join(" ") + "<br>";
-        window._originalConsoleLog.apply(console, args);
-      };
-      try {
-        eval(code);
-      } catch (error) {
-        outputDiv.innerHTML += `<span style="color: red;">Error: ${error.message}</span><br>`;
-      }
-      console.log = window._originalConsoleLog;
-    }
-
-    async function runPython(code) {
-      let outputDiv = document.getElementById("output");
-      outputDiv.innerHTML = "Running Python Code...";
-
-      try {
-        let response = await fetch("https://emkc.org/api/v2/piston/execute", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            language: "python",
-            version: "3.10.0",
-            files: [{ content: code }]
-          })
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: "// JavaScript Code\nconsole.log('Hello, World!');",
+                language: currentLanguage,
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: fontSize
+            });
         });
-        let result = await response.json();
-        outputDiv.innerHTML = result.run.stderr 
-          ? `<span style="color: red;">Error: ${result.run.stderr}</span>` 
-          : result.run.stdout || "No output";
-      } catch (error) {
-        outputDiv.innerHTML = `<span style="color: red;">API Error: ${error.message}</span>`;
-      }
-    }
 
-    function updateFontSize() {
-      fontSize = parseInt(document.getElementById("fontSize").value);
-      editor.updateOptions({ fontSize: fontSize });
-    }
+        function changeLanguage() {
+            currentLanguage = document.getElementById("languageSelector").value;
+            let defaultCode = "";
+            if (currentLanguage === "javascript") {
+                defaultCode = "// JavaScript Code\nconsole.log('Hello, World!');";
+            } else if (currentLanguage === "python") {
+                defaultCode = "# Python Code\nprint('Hello, World!')";
+            } else if (currentLanguage === "nodejs") {
+                defaultCode = "// Node.js Code\nconsole.log('Hello from Node.js!');\n// Example using a CDN-based library (lodash)\nconst _ = require('lodash');\nconsole.log(_.map([1, 2, 3], (n) => n * 2));  // Should output [2, 4, 6]";
+            }
+            editor.setValue(defaultCode);
+            monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
+        }
 
-    function downloadCode() {
-      let code = editor.getValue();
-      let extension = { javascript: "js", python: "py" }[currentLanguage];
+        function displayOutput(output, type = 'log') {
+            const consoleDiv = document.getElementById("console");
+            let outputElement;
 
-      let filename = prompt("Enter the filename (without extension):", "code");
-      if (!filename) return;
-      filename = filename.replace(/\.[^/.]+$/, "") + `.${extension}`;
+            if (type === 'error') {
+                outputElement = document.createElement('span');
+                outputElement.className = 'error';
+                outputElement.textContent = output;
+            }
+            else if (type === 'warn'){
+                outputElement = document.createElement('span');
+                outputElement.className = 'warning';
+                outputElement.textContent = output;
+            }
+            else {
+                outputElement = document.createTextNode(output);
+            }
 
-      let blob = new Blob([code], { type: "text/plain" });
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-    }
+            consoleDiv.appendChild(outputElement);
+            consoleDiv.appendChild(document.createTextNode('\n'));
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
 
-    // Divider functionality for horizontal resizing
-    const divider = document.getElementById("divider");
-    const container = document.querySelector(".container");
-    let isDragging = false;
+        // Capture console.log, console.error, and console.warn
+        (function() {
+            let originalConsoleLog = console.log;
+            let originalConsoleError = console.error;
+            let originalConsoleWarn = console.warn;
 
-    divider.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      document.body.style.cursor = "col-resize";
-    });
+            console.log = function(...args) {
+                let message = args.join(' ');
+                displayOutput(message, 'log');
+                originalConsoleLog.apply(console, args);
+            };
 
-    document.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-      // Get container's bounding rectangle
-      let containerRect = container.getBoundingClientRect();
-      // Calculate new width for editor based on mouse position
-      let newEditorWidth = e.clientX - containerRect.left;
-      // Set minimum width to avoid collapse
-      if(newEditorWidth < 100) newEditorWidth = 100;
-      if(newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
-      
-      // Adjust flex basis of editor and output
-      document.getElementById("editor").style.flex = "none";
-      document.getElementById("editor").style.width = newEditorWidth + "px";
-      
-      // Remaining width for output
-      let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
-      document.getElementById("output").style.flex = "none";
-      document.getElementById("output").style.width = newOutputWidth + "px";
-    });
+            console.error = function(...args) {
+                let message = args.join(' ');
+                displayOutput(message, 'error');
+                originalConsoleError.apply(console, args);
+            };
 
-    document.addEventListener("mouseup", () => {
-      if (isDragging) {
-        isDragging = false;
-        document.body.style.cursor = "default";
-      }
-    });
-  </script>
+            console.warn = function(...args) {
+                let message = args.join(' ');
+                displayOutput(message, 'warn');
+                originalConsoleWarn.apply(console, args);
+            };
+        })();
+
+        function runCode() {
+            const code = editor.getValue();
+            if (currentLanguage === "javascript") {
+                runJavaScript(code);
+            } else if (currentLanguage === "python") {
+                runPython(code);
+            } else if (currentLanguage === "nodejs") {
+                runNodeJS(code);
+            }
+        }
+
+        function runJavaScript(code) {
+            try {
+                eval(code);
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        async function runPython(code) {
+            const outputDiv = document.getElementById("console");
+            outputDiv.innerHTML = "Running Python Code...";
+
+            try {
+                let response = await fetch("https://emkc.org/api/v2/piston/execute", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        language: "python",
+                        version: "3.10.0",
+                        files: [{ content: code }]
+                    })
+                });
+                let result = await response.json();
+                if (result.run.stderr) {
+                    console.error(result.run.stderr);
+                }
+                else{
+                    console.log(result.run.stdout || "No output");
+                }
+
+            } catch (error) {
+                console.error(`API Error: ${error.message}`);
+            }
+        }
+
+        async function runNodeJS(code) {
+            const outputDiv = document.getElementById("console");
+            outputDiv.innerHTML = "Running Node.js Code...";
+            // Add CDN link to the page.
+            const lodashScript = document.createElement('script');
+            lodashScript.src = "https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js";
+            lodashScript.onload = async () => {
+              try {
+                    let response = await fetch("https://emkc.org/api/v2/piston/execute", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            language: "javascript",
+                            version: "18.x",
+                            files: [{ content: code }]
+                        })
+                    });
+                    let result = await response.json();
+                    if (result.run.stderr) {
+                        console.error(result.run.stderr);
+                    }
+                    else{
+                        console.log(result.run.stdout || "No output");
+                    }
+
+                } catch (error) {
+                    console.error(`API Error: ${error.message}`);
+                }
+            }
+            document.body.appendChild(lodashScript);
+
+
+        }
+
+        function updateFontSize() {
+            fontSize = parseInt(document.getElementById("fontSize").value);
+            editor.updateOptions({ fontSize: fontSize });
+        }
+
+        function downloadCode() {
+            let code = editor.getValue();
+            let extension = { javascript: "js", python: "py", nodejs: "js" }[currentLanguage];
+            let filename = prompt("Enter the filename (without extension):", "code");
+            if (!filename) return;
+            filename = filename.replace(/\.[^/.]+$/, "") + `.${extension}`;
+            let blob = new Blob([code], { type: "text/plain" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // Divider functionality for horizontal resizing
+        const divider = document.getElementById("divider");
+        const container = document.querySelector(".container");
+        let isDragging = false;
+
+        divider.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            document.body.style.cursor = "col-resize";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+            let containerRect = container.getBoundingClientRect();
+            let newEditorWidth = e.clientX - containerRect.left;
+            if (newEditorWidth < 100) newEditorWidth = 100;
+            if (newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
+            document.getElementById("editor-container").style.flex = "none";
+            document.getElementById("editor-container").style.width = newEditorWidth + "px";
+            let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
+            document.getElementById("console").style.flex = "none";
+            document.getElementById("console").style.width = newOutputWidth + "px";
+        });
+
+        document.addEventListener("mouseup", () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = "default";
+            }
+        });
+    </script>
 </body>
 </html>
