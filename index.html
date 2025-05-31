@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JavaScript Editor</title>
 
-    <link rel="icon" type="image/png" href="Screenshot 2025-03-26 050804.png" />
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/007ACC/FFFFFF?text=JS" />
 
     <link
         href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
@@ -29,17 +29,18 @@
             flex-direction: column;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Prevent body scrollbars */
         }
 
         h2 {
             text-align: center;
             margin-bottom: 15px;
+            color: #007acc; /* Title color */
         }
 
         .controls {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
             justify-content: center;
             gap: 10px;
             margin-bottom: 10px;
@@ -49,103 +50,140 @@
             padding: 10px 15px;
             font-size: 16px;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #555; /* Subtle border */
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        select {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
             background-color: #333;
             color: #eee;
         }
 
-        input {
-            background-color: #333;
-            color: #eee;
-            width: 80px;
+        input[type="number"] {
+            width: 80px; /* Specific width for font size input */
         }
 
         button {
             background-color: #007acc;
             color: #fff;
+            border-color: #007acc; /* Match background */
         }
 
         button:hover {
             background-color: #005f99;
+            border-color: #005f99;
+        }
+
+        button i {
+            margin-right: 5px; /* Space between icon and text */
         }
 
         .container {
             display: flex;
-            gap: 0;
-            flex: 1;
+            gap: 0; /* No gap, divider handles spacing */
+            flex: 1; /* Take remaining vertical space */
             border: 1px solid #555;
             border-radius: 5px;
-            overflow: hidden;
+            overflow: hidden; /* Important for child elements to not overflow */
+            min-height: 0; /* Fix for flex item overflow in some browsers */
         }
 
         #editor-container {
-            flex: 2;
-            border-right: 1px solid #555;
-            overflow: hidden;
-            position: relative;
+            flex: 2; /* Default proportion */
+            /* border-right: 1px solid #555; */ /* Handled by divider now */
+            overflow: hidden; /* Monaco editor needs this */
+            position: relative; /* For Monaco editor positioning */
+            display: flex; /* To allow editor to fill space */
+            flex-direction: column; /* Stack elements vertically if needed */
         }
 
         #editor {
             width: 100%;
             height: 100%;
-            position: absolute;
+            /* position: absolute;
             top: 0;
-            left: 0;
+            left: 0; */ /* Monaco handles its own layout within its container */
         }
 
         #divider {
-            width: 5px;
+            width: 8px; /* Slightly thicker for easier grabbing */
             background: #444;
             cursor: col-resize;
+            flex-shrink: 0; /* Prevent divider from shrinking */
+            position: relative; /* For z-index if needed */
+            z-index: 10; /* Ensure divider is on top */
+        }
+
+        #console-wrapper {
+            flex: 1; /* Default proportion */
+            display: flex; /* To contain the console and manage its visibility */
+            flex-direction: column; /* Stack elements vertically if needed */
+            overflow: hidden; /* Prevent scrollbars on wrapper */
+            background-color: #1E1E1E; /* Match console background */
         }
 
         #console {
-            flex: 1;
             background-color: #1E1E1E;
-            color: #007acc;
+            color: #00AACC; /* Brighter blue for console text */
             padding: 15px;
-            border-radius: 0;
+            border-radius: 0; /* No border radius as it's inside a wrapper */
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
             overflow-wrap: break-word;
             font-size: 16px;
             margin-top: 0;
-            overflow: auto;
-            max-height: 100%;
+            overflow: auto; /* Allow console to scroll internally */
+            height: 100%; /* Fill the wrapper */
             box-shadow: none;
+            border-left: 1px solid #555; /* Add border to console when visible */
         }
-
-       
 
         .error {
-            color: #f00;
+            color: #f44336; /* Brighter red for errors */
         }
         .warning{
-            color: #FFA500;
+            color: #FFA500; /* Standard orange for warnings */
         }
 
         /* Responsive Design */
         @media (max-width: 900px) {
             .container {
                 flex-direction: column;
-                height: auto;
+                /* height: auto; */ /* Let flex handle height */
             }
 
             #divider {
-                height: 5px;
+                height: 8px; /* Thicker for easier grabbing */
                 width: 100%;
                 cursor: row-resize;
             }
 
-            #editor-container, #console {
+            #editor-container{
                 width: 100%;
-                height: 50vh;
+                height: auto; /* Let flex handle height */
+                min-height: 200px; /* Minimum height for editor */
+                flex-basis: 50%; /* Default split */
             }
+            #console-wrapper {
+                width: 100%;
+                height: auto; /* Let flex handle height */
+                min-height: 150px; /* Minimum height for console */
+                flex-basis: 50%; /* Default split */
+            }
+            #console {
+                 border-left: none; /* No left border in column layout */
+                 border-top: 1px solid #555; /* Top border instead */
+            }
+        }
+         /* Hide scrollbar for cleaner look, but still scrollable */
+        #console::-webkit-scrollbar {
+            width: 8px;
+        }
+        #console::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+        #console::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 4px;
+            border: 2px solid #2a2a2a;
         }
     </style>
 </head>
@@ -155,20 +193,24 @@
     <div class="controls">
         <select id="languageSelector" onchange="changeLanguage()">
             <option value="javascript">JavaScript</option>
-        </select>
+            </select>
 
         <input type="number" id="fontSize" value="18" min="10" max="30" onchange="updateFontSize()">
 
         <button onclick="runCode()">
-            <i class="ri-play-fill"></i> Run
+            <i class="ri-play-line"></i> Run
         </button>
 
         <button onclick="downloadCode()">
-            <i class="ri-file-download-fill"></i> Download
+            <i class="ri-download-2-line"></i> Download
         </button>
 
         <button onclick="clearConsole()">
-            <i class="ri-delete-bin-fill"></i> Clear
+            <i class="ri-delete-bin-line"></i> Clear Console
+        </button>
+
+        <button id="toggleConsoleBtn" onclick="toggleConsole()">
+            <i class="ri-eye-off-line"></i> Hide Console
         </button>
     </div>
 
@@ -177,23 +219,39 @@
             <div id="editor"></div>
         </div>
         <div id="divider"></div>
-        <div id="console"></div>
+        <div id="console-wrapper">
+             <div id="console"></div>
+        </div>
     </div>
 
     <script>
         let editor;
         let fontSize = 18;
         let currentLanguage = "javascript";
+        let isConsoleVisible = true;
 
+        // Monaco Editor Loader
         require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             editor = monaco.editor.create(document.getElementById('editor'), {
-                value: "// JavaScript Code\nconsole.log('Hello, World!');",
+                value: "// JavaScript Code\nconsole.log('Hello, World!');\n\nfunction greet(name) {\n  console.warn('This is a warning for:', name);\n  return `Hello, ${name}!`;\n}\n\ngreet('Editor User');\n\n// To test errors:\n// console.error('This is a test error!');\n// nonExistentFunction();",
                 language: currentLanguage,
-                theme: 'vs-dark',
-                automaticLayout: true,
-                fontSize: fontSize
+                theme: 'vs-dark', // Popular dark theme
+                automaticLayout: true, // Adjusts editor layout on container resize
+                fontSize: fontSize,
+                minimap: { enabled: true }, // Enable minimap
+                scrollbar: {
+                    verticalScrollbarSize: 10,
+                    horizontalScrollbarSize: 10
+                }
             });
+
+            // Ensure editor resizes with its container (especially after console toggle)
+            // new ResizeObserver(() => {
+            //     if (editor) {
+            //         editor.layout();
+            //     }
+            // }).observe(document.getElementById('editor-container'));
         });
 
         function changeLanguage() {
@@ -202,128 +260,313 @@
             if (currentLanguage === "javascript") {
                 defaultCode = "// JavaScript Code\nconsole.log('Hello, World!');";
             }
-            editor.setValue(defaultCode);
-            monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
+            // Add other language defaults here
+            if (editor) {
+                editor.setValue(defaultCode);
+                monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
+            }
         }
 
         function displayOutput(output, type = 'log') {
             const consoleDiv = document.getElementById("console");
+            if (!consoleDiv) return;
+
             let outputElement;
+            const lineBreak = document.createTextNode('\n');
+
+            // Stringify objects and arrays for better display
+            if (typeof output === 'object' && output !== null) {
+                try {
+                    output = JSON.stringify(output, null, 2); // Pretty print JSON
+                } catch (e) {
+                    output = String(output); // Fallback for non-serializable objects
+                }
+            } else {
+                output = String(output); // Ensure it's a string
+            }
+
 
             if (type === 'error') {
                 outputElement = document.createElement('span');
                 outputElement.className = 'error';
                 outputElement.textContent = output;
-            }
-            else if (type === 'warn'){
+            } else if (type === 'warn'){
                 outputElement = document.createElement('span');
                 outputElement.className = 'warning';
                 outputElement.textContent = output;
-            }
-            else {
+            } else {
+                // For regular logs, create a text node directly
                 outputElement = document.createTextNode(output);
             }
 
             consoleDiv.appendChild(outputElement);
-            consoleDiv.appendChild(document.createTextNode('\n'));
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            consoleDiv.appendChild(lineBreak);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to bottom
         }
 
         // Capture console.log, console.error, and console.warn
         (function() {
-            let originalConsoleLog = console.log;
-            let originalConsoleError = console.error;
-            let originalConsoleWarn = console.warn;
+            const originalConsoleLog = console.log;
+            const originalConsoleError = console.error;
+            const originalConsoleWarn = console.warn;
+            const originalConsoleClear = console.clear; // Capture console.clear
 
             console.log = function(...args) {
-                let message = args.join(' ');
+                const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' ');
                 displayOutput(message, 'log');
-                originalConsoleLog.apply(console, args);
+                originalConsoleLog.apply(console, args); // Also log to browser console
             };
 
             console.error = function(...args) {
-                let message = args.join(' ');
+                const message = args.map(arg => arg instanceof Error ? arg.stack || arg.message : String(arg)).join(' ');
                 displayOutput(message, 'error');
-                originalConsoleError.apply(console, args);
+                originalConsoleError.apply(console, args); // Also log to browser console
             };
 
             console.warn = function(...args) {
-                let message = args.join(' ');
+                const message = args.map(arg => String(arg)).join(' ');
                 displayOutput(message, 'warn');
-                originalConsoleWarn.apply(console, args);
+                originalConsoleWarn.apply(console, args); // Also log to browser console
+            };
+
+            console.clear = function() { // Override console.clear
+                clearConsole(); // Call our custom clear function
+                originalConsoleClear.apply(console); // Also clear browser console
             };
         })();
 
         function runCode() {
+            if (!editor) return;
             const code = editor.getValue();
             const consoleDiv = document.getElementById("console");
-            consoleDiv.innerHTML = ""; // Clear previous output
+            if (consoleDiv) { // Clear previous output from our custom console
+                consoleDiv.innerHTML = "";
+            }
+
             if (currentLanguage === "javascript") {
                 runJavaScript(code);
             }
+            // Add other language runners here
         }
 
         function runJavaScript(code) {
             try {
-                eval(code);
+                // Using Function constructor for a slightly safer eval
+                // and to avoid polluting the global scope as much.
+                new Function(code)();
             } catch (error) {
-                console.error(error.message);
+                console.error(error); // Log the full error object for stack trace
+            }
+        }
+
+        function updateFontSize() {
+            fontSize = parseInt(document.getElementById("fontSize").value);
+            if (editor) {
+                editor.updateOptions({ fontSize: fontSize });
+            }
+        }
+
+        function downloadCode() {
+            if (!editor) return;
+            const code = editor.getValue();
+            const extensionMap = { javascript: "js" /*, python: "py", etc. */ };
+            const extension = extensionMap[currentLanguage] || "txt";
+
+            // Simple prompt for filename. For a better UX, consider a modal.
+            let filename = prompt("Enter the filename (without extension):", "myCode");
+            if (!filename) return; // User cancelled
+
+            filename = filename.replace(/\.[^/.]+$/, "") + `.${extension}`; // Ensure correct extension
+
+            const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link); // Clean up
+            URL.revokeObjectURL(link.href); // Release object URL
+        }
+
+        function clearConsole() {
+            const consoleDiv = document.getElementById("console");
+            if (consoleDiv) {
+                consoleDiv.innerHTML = "";
+            }
+        }
+
+        function toggleConsole() {
+            const consoleWrapper = document.getElementById("console-wrapper");
+            const divider = document.getElementById("divider");
+            const editorContainer = document.getElementById("editor-container");
+            const toggleBtn = document.getElementById("toggleConsoleBtn");
+            const isCurrentlyResponsive = window.innerWidth <= 900;
+
+
+            isConsoleVisible = !isConsoleVisible;
+
+            if (isConsoleVisible) {
+                consoleWrapper.style.display = "flex"; // Or "block" if not flex
+                divider.style.display = "block"; // Or "flex" if it's a flex item
+                toggleBtn.innerHTML = '<i class="ri-eye-off-line"></i> Hide Console';
+
+                // Restore layout based on orientation
+                if (isCurrentlyResponsive) { // Column layout
+                    editorContainer.style.flexBasis = "50%";
+                    consoleWrapper.style.flexBasis = "50%";
+                    editorContainer.style.height = "auto"; // Let flex handle it
+                } else { // Row layout
+                    editorContainer.style.flex = "2"; // Restore flex proportions
+                    consoleWrapper.style.flex = "1";
+                    editorContainer.style.width = ""; // Remove fixed width
+                }
+
+            } else {
+                consoleWrapper.style.display = "none";
+                divider.style.display = "none";
+                toggleBtn.innerHTML = '<i class="ri-eye-line"></i> Show Console';
+
+                // Editor takes full space
+                if (isCurrentlyResponsive) { // Column layout
+                     editorContainer.style.flexBasis = "100%";
+                     editorContainer.style.height = "calc(100% - 0px)"; // Adjust if controls have variable height
+                } else { // Row layout
+                    editorContainer.style.flex = "1"; // Take full width
+                    editorContainer.style.width = "100%";
+                }
+            }
+            // Crucial for Monaco editor to re-layout itself
+            if (editor) {
+                 setTimeout(() => editor.layout(), 0);
             }
         }
 
 
-
-        function updateFontSize() {
-            fontSize = parseInt(document.getElementById("fontSize").value);
-            editor.updateOptions({ fontSize: fontSize });
-        }
-
-        function downloadCode() {
-            let code = editor.getValue();
-            let extension = { javascript: "js" }[currentLanguage];
-            let filename = prompt("Enter the filename (without extension):", "code");
-            if (!filename) return;
-            filename = filename.replace(/\.[^/.]+$/, "") + `.${extension}`;
-            let blob = new Blob([code], { type: "text/plain" });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-        }
-
-        function clearConsole() {
-            document.getElementById("console").innerHTML = "";
-        }
-
-        // Divider functionality for horizontal resizing
+        // Divider functionality (Draggable Splitter)
         const divider = document.getElementById("divider");
         const container = document.querySelector(".container");
+        const editorContainer = document.getElementById("editor-container");
+        const consoleWrapper = document.getElementById("console-wrapper");
         let isDragging = false;
 
         divider.addEventListener("mousedown", (e) => {
+            e.preventDefault(); // Prevent text selection during drag
             isDragging = true;
-            document.body.style.cursor = "col-resize";
+            const isResponsive = window.innerWidth <= 900;
+            document.body.style.cursor = isResponsive ? "row-resize" : "col-resize";
+            // Add classes for visual feedback during drag if desired
+            // container.classList.add('dragging');
         });
 
         document.addEventListener("mousemove", (e) => {
-            if (!isDragging) return;
-            let containerRect = container.getBoundingClientRect();
-            let newEditorWidth = e.clientX - containerRect.left;
-            if (newEditorWidth < 100) newEditorWidth = 100;
-            if (newEditorWidth > containerRect.width - 100) newEditorWidth = containerRect.width - 100;
-            document.getElementById("editor-container").style.flex = "none";
-            document.getElementById("editor-container").style.width = newEditorWidth + "px";
-            let newOutputWidth = containerRect.width - newEditorWidth - divider.offsetWidth;
-            document.getElementById("console").style.flex = "none";
-            document.getElementById("console").style.width = newOutputWidth + "px";
+            if (!isDragging || !isConsoleVisible) return; // Only drag if console is visible
+
+            const isResponsive = window.innerWidth <= 900; // Check current mode
+            const containerRect = container.getBoundingClientRect();
+
+            if (isResponsive) { // Vertical resizing (column layout)
+                let newEditorHeight = e.clientY - containerRect.top;
+                // Constraints for editor height
+                if (newEditorHeight < 50) newEditorHeight = 50; // Min height
+                if (newEditorHeight > containerRect.height - 50 - divider.offsetHeight) {
+                    newEditorHeight = containerRect.height - 50 - divider.offsetHeight; // Max height, leave space for console
+                }
+                editorContainer.style.flex = "none"; // Disable flex basis for direct height control
+                editorContainer.style.height = newEditorHeight + "px";
+                consoleWrapper.style.flex = "none";
+                consoleWrapper.style.height = (containerRect.height - newEditorHeight - divider.offsetHeight) + "px";
+
+            } else { // Horizontal resizing (row layout)
+                let newEditorWidth = e.clientX - containerRect.left;
+                // Constraints for editor width
+                if (newEditorWidth < 100) newEditorWidth = 100; // Min width
+                if (newEditorWidth > containerRect.width - 100 - divider.offsetWidth) {
+                     newEditorWidth = containerRect.width - 100 - divider.offsetWidth; // Max width, leave space for console
+                }
+                editorContainer.style.flex = "none"; // Disable flex basis for direct width control
+                editorContainer.style.width = newEditorWidth + "px";
+                consoleWrapper.style.flex = "none";
+                consoleWrapper.style.width = (containerRect.width - newEditorWidth - divider.offsetWidth) + "px";
+            }
+             if (editor) {
+                editor.layout(); // Trigger Monaco editor layout update
+            }
         });
 
         document.addEventListener("mouseup", () => {
             if (isDragging) {
                 isDragging = false;
                 document.body.style.cursor = "default";
+                // container.classList.remove('dragging');
+
+                // After dragging, restore flex properties so they can adapt if console is hidden/shown
+                // or if window resizes, but keep the calculated sizes.
+                // This is a bit tricky. For now, we'll leave the direct pixel sizes.
+                // If you want true flex-based resizing after drag, you'd need to convert
+                // pixel sizes back to flex-basis percentages or similar.
+                // However, the current setup should maintain the dragged size.
+                // One option: set flex-grow, flex-shrink to 0 and keep flex-basis as the pixel value.
+                const isResponsive = window.innerWidth <= 900;
+                if (isResponsive) {
+                    editorContainer.style.flex = `0 0 ${editorContainer.style.height}`;
+                    consoleWrapper.style.flex = `0 0 ${consoleWrapper.style.height}`;
+                } else {
+                    editorContainer.style.flex = `0 0 ${editorContainer.style.width}`;
+                    consoleWrapper.style.flex = `0 0 ${consoleWrapper.style.width}`;
+                }
+                 if (editor) {
+                    editor.layout(); // Final layout update
+                }
             }
         });
+
+        // Handle window resize to switch divider behavior and re-layout
+        window.addEventListener('resize', () => {
+            if (editor) {
+                editor.layout();
+            }
+            // If console is hidden, ensure editor takes full space on resize
+            if (!isConsoleVisible) {
+                const isCurrentlyResponsive = window.innerWidth <= 900;
+                if (isCurrentlyResponsive) {
+                     editorContainer.style.flexBasis = "100%";
+                     editorContainer.style.height = "calc(100% - 0px)";
+                     editorContainer.style.width = "100%"; // Ensure width is also full
+                } else {
+                    editorContainer.style.flex = "1";
+                    editorContainer.style.width = "100%";
+                    editorContainer.style.height = "100%"; // Ensure height is also full
+                }
+            } else {
+                // If console is visible, reset flex properties to allow natural reflow
+                // or apply specific logic based on current drag state / fixed sizes.
+                // For simplicity, we can re-apply the default flex values if not dragging.
+                if (!isDragging) {
+                    const isCurrentlyResponsive = window.innerWidth <= 900;
+                    if (isCurrentlyResponsive) {
+                        editorContainer.style.flex = ""; // Reset to CSS defined
+                        editorContainer.style.height = "";
+                        editorContainer.style.width = "100%";
+                        consoleWrapper.style.flex = "";
+                        consoleWrapper.style.height = "";
+                        consoleWrapper.style.width = "100%";
+                        editorContainer.style.flexBasis = "50%";
+                        consoleWrapper.style.flexBasis = "50%";
+
+                    } else {
+                        editorContainer.style.flex = "";
+                        editorContainer.style.width = "";
+                        editorContainer.style.height = "100%";
+                        consoleWrapper.style.flex = "";
+                        consoleWrapper.style.width = "";
+                        consoleWrapper.style.height = "100%";
+                        editorContainer.style.flex = "2";
+                        consoleWrapper.style.flex = "1";
+                    }
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
